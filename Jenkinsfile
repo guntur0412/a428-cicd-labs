@@ -29,16 +29,13 @@ pipeline {
         }
     }
 }
-
-
-     stage('Deploy') {
-    	agent any
-    	steps {
-        	sh '''
-       		docker build -t react-app .
-        	docker rm -f react-running || true
-        	docker run -d --name react-running -p 3000:3000 react-app
-        	'''
-         }
-     }
+        stage('Deploy Container') {
+            steps {
+                sh '''
+                echo "Deploying container..."
+                docker build -t my-react-app .
+                docker run -d -p 3000:3000 --name react-container my-react-app
+                '''
+            }
+        }
 
