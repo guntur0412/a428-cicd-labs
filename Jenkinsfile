@@ -13,7 +13,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'npm install'
-        	sh 'npm start -- --host 0.0.0.0'
+		sh 'HOST=0.0.0.0 npm start &'
             }
         }
         stage('Test') {
