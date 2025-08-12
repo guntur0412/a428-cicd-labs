@@ -3,6 +3,7 @@ pipeline {
         docker {
             image 'node:lts-buster-slim'
             args '-p 3000:3000'
+            args '--network=host'
         }
     }
     environment {
@@ -12,6 +13,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'npm install'
+        	sh 'npm start -- --host 0.0.0.0'
             }
         }
         stage('Test') {
