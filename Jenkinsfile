@@ -1,32 +1,27 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:lts-buster-slim'
-            args '-p 3000:3000'
-            args '--network=host'
-        }
-    }
-    environment {
-        CI = 'true'
-    }
-    stages {
-        stage('Build') {
-            steps {
-                sh 'npm install'
-		sh 'HOST=0.0.0.0 npm start &'
-            }
-        }
-        stage('Test') {
-            steps {
-                sh './jenkins/scripts/test.sh'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                sh './jenkins/scripts/deliver.sh'
-                sh './jenkins/scripts/kill.sh'
-            }
-        }
-    }
+	agent {
+		docker {
+			image 'node:16-buster-slim'
+			args '-p 3000:3000'
+		}
+		}
+		stages {
+			stage('Build') {
+				steps {
+					sh 'npm install'
+				}
+			}
+			stage('Test') {
+				steps {
+				sh './jenkins/scripts/test.sh'
+				}	
+			}
+			stage('Deploy') {
+				steps {
+					sh './jenkins/scripts/deliver.sh'
+					input message: 'tes'
+					sh './jenkins/scripts/kill.sh'
+				}
+		}
+	}
 }
-
