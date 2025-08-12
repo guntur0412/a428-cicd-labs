@@ -1,49 +1,32 @@
 pipeline {
     agent {
         docker {
-            image 'node:lts-bullseye-slim'
-            args '-p 30000:30000'
+            image 'node:lts-buster-slim'
+            args '-p 3000:3000'
+            args '--network=host'
         }
     }
-
-    options {
-        skipDefaultCheckout()
+    environment {
+        CI = 'true'
     }
-
     stages {
-        stage('Start') {
-            steps {
-                echo 'Memulai Proses Pipeline'
-                checkout scm
-            }
-        }
-
         stage('Build') {
             steps {
-                echo 'Proses Build Dimulai...'
                 sh 'npm install'
-                sh 'export NODE_OPTIONS=--openssl-legacy-provider && npm run build'
+		sh 'HOST=0.0.0.0 npm start &'
             }
         }
-
         stage('Test') {
             steps {
-                echo 'Menjalankan Test...'
-                sh 'CI=true npm test -- --watchAll=false'
+                sh './jenkins/scripts/test.sh'
             }
         }
-
-        stage('Deploy') {
+        stage('Deployr') {
             steps {
-                echo 'Melakukan Deploy aplikasi (simulasi)...'
                 sh './jenkins/scripts/deliver.sh'
-            }
-        }
-
-        stage('End') {
-            steps {
-                echo 'Pipeline Selesai ✅'
+                sh './jenkins/scripts/kill.sh'
             }
         }
     }
 }
+
