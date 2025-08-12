@@ -1,41 +1,49 @@
 pipeline {
     agent {
         docker {
-            image 'node:lts-buster-slim'
-            args '-p 3000:3000'
-            args '--network=host'
+            image 'node:lts-bullseye-slim'
+            args '-p 30000:30000'
         }
     }
-    environment {
-        CI = 'true'
+
+    options {
+        skipDefaultCheckout()
     }
+
     stages {
+        stage('Start') {
+            steps {
+                echo 'Memulai Proses Pipeline'
+                checkout scm
+            }
+        }
+
         stage('Build') {
             steps {
+                echo 'Proses Build Dimulai...'
                 sh 'npm install'
-		sh 'HOST=0.0.0.0 npm start &'
+                sh 'export NODE_OPTIONS=--openssl-legacy-provider && npm run build'
             }
         }
+
         stage('Test') {
             steps {
-                sh './jenkins/scripts/test.sh'
+                echo 'Menjalankan Test...'
+                sh 'CI=true npm test -- --watchAll=false'
             }
         }
-        stage('Deliver') {
+
+        stage('Deploy') {
             steps {
+                echo 'Melakukan Deploy aplikasi (simulasi)...'
                 sh './jenkins/scripts/deliver.sh'
-                sh './jenkins/scripts/kill.sh'
+            }
+        }
+
+        stage('End') {
+            steps {
+                echo 'Pipeline Selesai ✅'
             }
         }
     }
 }
-        stage('Deploy Container') {
-            steps {
-                sh '''
-                echo "Deploying container..."
-                docker build -t my-react-app .
-                docker run -d -p 3000:3000 --name react-container my-react-app
-                '''
-            }
-        }
-
