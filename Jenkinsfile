@@ -8,6 +8,9 @@ pipeline {
     }
     environment {
         CI = 'true'
+    	DOCKER_HOST = 'unix:///var/run/docker.sock'
+}
+
     }
     stages {
         stage('Build') {
